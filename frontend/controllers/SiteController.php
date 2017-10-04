@@ -82,11 +82,11 @@ class SiteController extends Controller
         $data = array();
 
 //        $model = new Test();
-        $model = Test::find()->orderBy(['id' => SORT_DESC])->limit(1)->all();
+//        $model = Test::find()->orderBy(['id' => SORT_DESC])->limit(1)->all();
 
 //        $model->name = 'Ivan';
 //        $model->description = 'description description description description description';
-
+//
 //        $model->save();
 
 //        header('Content-Type: text/html; charset=utf-8');
