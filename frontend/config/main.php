@@ -14,6 +14,7 @@ return [
     'components' => [
         'request' => [
             'csrfParam' => '_csrf-frontend',
+            'baseUrl' => '',
         ],
         'user' => [
             'identityClass' => 'common\models\User',
@@ -41,8 +42,8 @@ return [
             'showScriptName' => false,
             'rules' => [
                 '' => 'site/index',
-                '<action:\w+>/' => 'site/<action>',
-                '<controller:\w+>/<action:\w+>/' => '<controller>/<action>',
+                '<action:[A-Za-z-_]+>/' => 'site/<action>',
+                '<controller:[A-Za-z-_]+>/<action:[A-Za-z-_]+>/' => '<controller>/<action>',
             ],
         ],
         /*

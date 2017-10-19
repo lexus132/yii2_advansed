@@ -3,51 +3,127 @@
 /* @var $this yii\web\View */
 
 $this->title = 'My Yii Application';
+
+$this->registerJsFile('/js/smallLoad.js',['depends' => [\yii\web\JqueryAsset::className()]]);
+$this->registerJs("
+    $(document).ready(function(){
+	$('#load_more').on('click', function(){
+	    $.ajax({
+		url:'".yii\helpers\Url::to(['/site/load-more'])."?next='+$('#load_more').val(),
+		type: 'POST',
+		contentType: 'json',
+		beforeSend: function(){
+		    $.loadingBlockShow({
+			imgPath: '/img/default.svg',
+			text: 'News Loading ...',
+			style: {
+			    position: 'fixed',
+			    width: '100%',
+			    height: '100%',
+			    background: 'rgba(0, 0, 0, .8)',
+			    color: '#fff',
+			    left: 0,
+			    top: 0,
+			    zIndex: 10000
+			}
+		    });
+		},
+		success: function (response) {
+		    if(response.successful){
+			    $('#content_body').append(response.successful);
+			    $('#load_more').val($('#load_more').val()*1 + 1);
+		    } else {
+			$('button#load_more').hide();
+		    }
+		},
+		complete: function(response) {
+		    $.loadingBlockHide();
+		}
+	    });
+	});
+		
+	$('#search').on('click', function(){
+	    var data = $('input[name=\"search\"]');
+	    var form = $('form#search_form');
+	    if((data.val()).length > 0){
+		console.log(form.serialize());
+		$.ajax({
+		    url:'".yii\helpers\Url::to(['/site/search'])."',
+		    type: 'POST',
+		    data: form.serialize(),
+		    beforeSend: function(){
+			$.loadingBlockShow({
+			    imgPath: '/img/default.svg',
+			    text: 'News Loading ...',
+			    style: {
+				position: 'fixed',
+				width: '100%',
+				height: '100%',
+				background: 'rgba(0, 0, 0, .8)',
+				color: '#fff',
+				left: 0,
+				top: 0,
+				zIndex: 10000
+			    }
+			});
+		    },
+		    success: function (response) {
+		    console.log(response);
+			if(response.successful){
+				$('#content_body').html(response.successful);
+				$('#load_more').hide();
+			} else {
+//			    $('#load_more').hide();
+			}
+		    },
+		    complete: function(response) {
+			$.loadingBlockHide();
+		    }
+		});
+	    }
+	});
+    });
+");
 ?>
 <div class="site-index">
 
-    <div class="jumbotron">
-        <h1>Congratulations!</h1>
-
-        <p class="lead">You have successfully created your Yii-powered application.</p>
-
-        <p><a class="btn btn-lg btn-success" href="http://www.yiiframework.com">Get started with Yii</a></p>
-    </div>
+	<div class="row" style="margin-bottom: 30px;">
+	    <div class="col-sm-6 col-sm-offset-3">
+		<form method="POST" id="search_form">
+		    <div class="input-group">
+		      <input type="hidden" name="<?=Yii::$app->request->csrfParam?>" value="<?=Yii::$app->request->csrfToken?>"/>
+		      <input name="search" type="text" class="form-control" placeholder="Search for..." value="">
+		      <span class="input-group-btn">
+			  <button id="search" class="btn btn-secondary" type="button"><span class="glyphicon glyphicon-search"></span></button>
+		      </span>
+		    </div>
+		</form>
+	    </div>
+	</div>
 
     <div class="body-content">
 
-        <div class="row">
-            <div class="col-lg-4">
-                <h2>Heading</h2>
+        <div id="content_body" class="row">
+	    
+	    <?php if(!empty($model)){ ?>
+		<?php foreach($model as $item){ ?>
+		    <div class="col-sm-4 col-xs-6" style=" height: 430px;">
 
-                <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et
-                    dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip
-                    ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu
-                    fugiat nulla pariatur.</p>
+			<a href="<?= (!empty($item->link))? $item->link : ''; ?>"><img src="<?= (!empty($item->image))? $item->getImageUrl() : ''; ?>" style="max-width: 100%; max-height: 50%;"></a>
 
-                <p><a class="btn btn-default" href="http://www.yiiframework.com/doc/">Yii Documentation &raquo;</a></p>
-            </div>
-            <div class="col-lg-4">
-                <h2>Heading</h2>
+			<a href="<?= (!empty($item->link))? $item->link : ''; ?>"><h3><?= (!empty($item->title))? \yii\helpers\StringHelper::truncate($item->title,45,'...') : ''; ?></h3></a>
 
-                <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et
-                    dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip
-                    ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu
-                    fugiat nulla pariatur.</p>
+			<p><?= (!empty($item->description))? \yii\helpers\StringHelper::truncate($item->description,45,'...') : ''; ?></p>
 
-                <p><a class="btn btn-default" href="http://www.yiiframework.com/forum/">Yii Forum &raquo;</a></p>
-            </div>
-            <div class="col-lg-4">
-                <h2>Heading</h2>
-
-                <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et
-                    dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip
-                    ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu
-                    fugiat nulla pariatur.</p>
-
-                <p><a class="btn btn-default" href="http://www.yiiframework.com/extensions/">Yii Extensions &raquo;</a></p>
-            </div>
+			<p><a class="btn btn-default" href="<?= (!empty($item->link))? $item->link : ''; ?>">Reed more &raquo;</a></p>
+		    </div>
+		<?php } ?>
+	    <?php } ?>
         </div>
-
+	
+	<div class="row">
+	    <button id="load_more" type="button" class="btn btn-lg btn-success" value="<?= 1 ?>">Load more</button>
+	</div>
+	
     </div>
 </div>

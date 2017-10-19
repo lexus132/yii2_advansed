@@ -11,17 +11,19 @@ return [
     'basePath' => dirname(__DIR__),
     'controllerNamespace' => 'backend\controllers',
     'bootstrap' => ['log'],
-    'modules' => [],
+    'defaultRoute' => 'news',
+    'modules' => [
+	'dynagrid' => [
+		'class' => '\common\widgets\DynaGridModule',
+	],
+	'gridview' => [
+		'class' => '\kartik\grid\Module',
+	],
+    ],
     'components' => [
-        'view' => [
-            'theme' => [
-                'pathMap' => [
-                    '@app/views' => '@vendor/wkii/yii2-adminlte/example-views/yii2-app'
-                ],
-            ],
-        ],
         'request' => [
             'csrfParam' => '_csrf-backend',
+            'baseUrl' => '/admin',
         ],
         'user' => [
             'identityClass' => 'common\models\User',
@@ -48,13 +50,18 @@ return [
             'enablePrettyUrl' => true,
             'showScriptName' => false,
             'rules' => [
-                '' => 'site/index',
+                '' => 'news/index',
                 '<action:\w+>/' => 'site/<action>',
                 '<controller:\w+>/<action:\w+>/' => '<controller>/<action>',
             ],
         ],
-        /*
-        */
+	'urlManagerFrontend' => [
+	    'class' => 'yii\web\UrlManager',
+	    'baseUrl' => 'http://news.second.zzz.com.ua/',
+	    'enablePrettyUrl' => true,
+	    'enableStrictParsing' => true,
+	    'showScriptName' => false,
+	],
     ],
     'params' => $params,
 ];
